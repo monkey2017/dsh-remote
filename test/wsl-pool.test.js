@@ -93,3 +93,19 @@ test('detect reports a Linux platform without touching Git Bash', async () => {
   assert.equal(pool.platform, 'linux')
   assert.equal(pool.shellMode, 'native')
 })
+
+test('createPool returns WslPool for backend wsl and ActivePool swaps delegates', async () => {
+  const { createPool, ActivePool } = await import('../lib/pool.js')
+  const pool = createPool(
+    { backend: 'wsl', distro: 'Ubuntu', host: 'wsl:Ubuntu' },
+    { spawnImpl: fakeSpawn({ stdin: [] }), platform: 'win32', listDistrosImpl: async () => ['Ubuntu'], detectRoot: () => '\\\\wsl.localhost\\Ubuntu' },
+  )
+  assert.equal(pool.constructor.name, 'WslPool')
+
+  const active = new ActivePool({ backend: 'native', host: 'h', port: 22, username: 'u' }, {})
+  assert.notEqual(active._delegate.constructor.name, 'WslPool')
+  active.setTarget({ host: 'wsl:Ubuntu', port: 0, username: '', backend: 'wsl', distro: 'Ubuntu' })
+  assert.equal(active._delegate.constructor.name, 'WslPool')
+  active.setTarget({ host: 'h', port: 22, username: 'u', backend: 'native' })
+  assert.notEqual(active._delegate.constructor.name, 'WslPool')
+})
