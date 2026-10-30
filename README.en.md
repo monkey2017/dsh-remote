@@ -66,6 +66,18 @@ The rest:
 - **Data lives under the harness home** — machines and mirrors follow `$DSH_HOME`; pre-0.6 data migrates automatically on first run.
 - **No `dsh-workspace` core changes** — everything ships as a normal plugin.
 
+### Local WSL (`0.8.66+`)
+
+On Windows a WSL distro can be used as a remote workspace directly: Settings → Remote workspace →
+Local WSL → Add, then pick a folder, mirror it, and use the `rw_*` tools and `rw_exec` — no sshd
+inside WSL required.
+
+Files go through `\\wsl.localhost\<distro>\…` (falling back to `\\wsl$\…` on older builds), commands
+through `wsl.exe -d <distro> -- bash -s`; mirrors, sync and search behave exactly like an SSH machine.
+
+v1 limits: the embedded terminal, port forwarding, one-click deploy and the remote DSH UI are not
+supported — those entries say so explicitly.
+
 ## Install
 
 ### DSH version compatibility
